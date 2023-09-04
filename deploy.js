@@ -6,7 +6,7 @@ async function main() {
     "http://127.0.0.1:7545"
   );
   const wallet = new ethers.Wallet(
-    "0xad872463c08bb51502a7a6b561570fa96ac872fff22606784cec3f8d62663c6e",
+    "0x735aa3ce07a8c22595c58a38e67a47e9594a34028d4c4dc1ae3bcefd3f29ae08",
     provider
   );
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
@@ -14,11 +14,25 @@ async function main() {
     "./SimpleStorage_sol_SimpleStorage.bin",
     "utf8"
   );
-  const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
-  console.log("Deploying,Please wait ...");
-  const contract = await contractFactory.deploy();
-  const deploymentReciept = await contract.deployTransaction.wait(1);
-  console.log(deploymentReciept);
+  //   const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
+  //   console.log("Deploying,Please wait ...");
+  //   const contract = await contractFactory.deploy();
+  //   const deploymentReciept = await contract.deployTransaction.wait(1);
+
+  console.log("let's deploy only using transactions data!");
+  const nonce = await wallet.getTransactionCount();
+  let tx = {
+    nonce: nonce,
+    gasPrice: 20000000000,
+    gasLimit: 6721975,
+    to: null,
+    value: 0,
+    data: "0x" + binary,
+    chainId: 1337,
+  };
+  const sendTxtResponse = await wallet.sendTransaction(tx);
+  await sendTxtResponse.wait(1);
+  console.log(sendTxtResponse);
 }
 
 main()
